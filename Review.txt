@@ -1,0 +1,104 @@
+O Notation
+	k = some constant. Constants
+		O(k n) becomes O(n)
+		O(k) becomes O(1)
+	Unsorted Array
+		Find:		O(n)
+		Remove:		O(1)
+		Add:		O(1)
+	Sorted:
+		Find:		O(log(n))
+		Remove:		O(n)
+		Add:		O(n)
+	Linked Lists:
+		Find:		O(n)
+		Remove:		O(1)
+		Add:		O(1)
+	BST-Full:
+		Find:		O(log(n))
+		Remove:		O(log(n))
+		Add:		O(log(n))
+	
+	O(n+log(n)) -> Dominate term thats priority -> O(n)
+Sorting
+	Insertion Sort
+		Idea:
+		[1, 3, 5, 4, 2]
+		[1, 3, 4, 5, 2]
+		[1, 3, 4, 2, 5]
+		[1, 3, 2, 4, 5]
+		[1, 2, 3, 4, 5]
+		Worst Case:	O(n^2)
+
+	Merge Sort:
+		Idea:
+		[3][2][5][7][4][6][1][8]
+		[2, 3][5, 7][4, 6][1, 8] <- Iteration 1
+		[2, 3, 5, 7][1, 4, 6, 8] <- Compare all elements in one array to one element in the adjacent array.
+		If it's less, move the element into the new array, then stop using that element in comparasions, and continue to the next comparision.
+		[1, 2, 3, 4, 5, 6, 7, 8]
+		Worst Case: O(nlog(n)) <- Best worst case
+	
+	Selection Sort:
+		Idea:
+		Find maximum, take it out.
+		[5, 3, 1, 2, 4]
+		[3, 1, 2, 4] 5
+		[3, 1, 2] 4, 5
+		[1, 2] 3, 4, 5
+		[1] 2, 3, 4, 5
+		Worst Complexity: O(n^2)
+	
+	Quick Sort:
+		Idea:
+		[3, 1, 5 | 4 | 6]
+		[3, 1 | 4 | 6, 5]
+		[[3], 1 | 4, 6 | 5]
+		[1, 3] [4, 5, 6]
+		Worst Complexity: O(n^2) if pivot is the largest of smallest value.
+		
+	
+Pointers
+	General
+		int a[5] = {9, 7, 5, 3, 1};
+		cout << a;?
+			Outputs the memory address of zeroth element in a. Ex: 0x000
+		cout << *a;?
+			Outputs the zeroth element in the array. Ex: 9
+		cout << a+3;?
+			Outputs the memory address of third element. Ex: 0x00C
+		cout << *(a+3)?
+			Outputs the third element. Ex: 3
+		*(a+n) = a[n] 
+		
+	Arithmetic
+		
+		
+Recursion
+	
+23)
+	void point_reverse(const strings)
+	{
+		if(s.length() > 0)
+		{
+			print.reverse(s.substring(1, s.length()-1))
+			cout << s[0];
+		}
+	}
+	Starting string: cow
+	String gets smaller each recursion
+	Next recursion string: ow
+	Next recustion string: w
+	Starts printing the first index of the string.
+	Prints: w, then o, then c.
+	Goal Output: woc
+	
+0 | {1, 6} {3, 7} 
+1 | {2, 42}
+2 | {0, 7}
+3 | {4, 6} {0,7}
+4 | {0, 1}
+
+24) Hash Tables
+	Linear: (1/2)(1 + 1/(1 - alpha))
+	Double Hashing: -ln(1- alpha)/alpha

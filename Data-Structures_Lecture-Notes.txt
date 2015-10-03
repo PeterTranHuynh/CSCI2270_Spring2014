@@ -1,0 +1,2077 @@
+1/15/14 - Data Structures and Algorithms Lecture 1, Memory Part 1
+	HW 1 will be posted on Friday
+	
+	Integers in C++
+		Computers store integers in binary form.
+		Decimal = Binary
+			 0 = 0
+			 1 = 1
+			 7 = 111
+			 87 = 1010111
+		For Binary numbers, a 1 in the last place in 2^0,
+			and a 1 in next to last place is 2^1
+			and so forth. All powers of 2.
+		Binary 1010111 = 1*2^0 + 1*2^1 + 1*2^2 + 0*2^3 + 1*2^4 + 0*2^5 + 1*2^6
+			= 1 + 2 + 4 + 16 + 64 = decimal 87.
+		
+		Each of those 0 or 1 binary digits take up 1 bit in memory. one bit is the tiniest amount of memory we can use, because it can only store 0 or 1
+			(or equivalently, false or true). Since bits are so tiny, we often talk about bytes instead; a byte is equal to 8 bits stuck together, or a series of 8
+			zeros and ones.
+		In my VM, integers take up 32 bits of memory, or 4 bytes.
+		If you wanted to find this info out for your machin, you could use the sizeof command:
+			cout << "integer size = " << sizeof(int) << " bytes." << endl;
+			
+		Remember that integers have a max and min size, too.
+		For my VM, the min is -2147483648 and the max is 2147483648. You can find this
+			(which may differ with your computer and C++ version) out by putting: #include <limits>
+			at the top of your code and including a line or 2 like:
+			cout << "min: " << numeric_limits<int>::min() << endl << "max: " << numeric_limits<int>::max() << endl;
+		
+		These limits come from having only 32 bits available to hold the data.We use 1 bit to store the sign of the integer. That leaves use 31 bits to use for binary digits.
+		If you compute 2^31, you get 2147483648 (which is the size of the largest negative integer we can store.)
+		If you compute 2^31 - 1, you get 2147483647 (which is the largest positive integer we can store; we get one less digit for the positive range
+			because we also have to store the integer 0).
+		
+		In other words, the memory space for an integer determines what range of numbers that integer is allowed to have.
+		When  integers 'roll over' from a large positive value to a large negative value or vice versa, it's a direct consequence of this 32-bit limit.
+		Full disclosure; computers actually store integers a little differently than this, but we'll skip the details
+		-
+		
+		Clicker: What is the max value of an integer of 8 bytes can store (C++ longs)? 2^63 - 1.
+		Clicker: What is the min value of an integer of 8 bytes can store (C++ longs)? -(2^63)
+		Clicker: What is the max value that an unsigned integer of 8 bytes can store (C++ unsigned longs, always >= 0)? 2^64 - 1
+		Clicker: What is the min value that an unsigned integer of 8 bytes can store (C++ unsigned longs, always >= 0)? 0
+		
+		Here's a simple function that makes one integer variable called a.
+		Void example1()
+		{
+			int a = 5;
+		}
+		The compiler sees the int a and recongnizes this as an integer variable. Like you, the compiler knows how much memory an integer can take up.
+		
+		Integers at Compile Time
+			The compiler reserves that memory for a using a local array of memory (called the stack).
+			It's in 8-bit blocks, and showing you hexadecimal addresses of some of the blocks.
+			After the compiler sees the line int a = 5; it reserves a spot for that integer a on this stack of memory and writes the 5 into this spot (in binary). 
+				If each slot is a byte, this int will take up 4 slots. the os makes sure that no other stuff gets written into that location, as long as it exists.
+		
+1-17-14 - Memory part 2
+	Integers at Compile Time
+		void example1()
+		{
+			int a = 5;
+		}
+		At the end of our function, just at the closing bracket }, the int a gets destroyed.
+		Destroying it means that we no longer keep that memory reserved on the stack for a. 
+		Now other variables can be written into a’s former slot in the memory stack. We can’t predict exactly when this will happen, but it’s only a matter of time before 
+			something else writes data over this slot
+		
+		voic example2()
+		{
+			int a = 5;
+			cout << a << endl;
+		}
+		When it runs , this code prints out the crrent value of a in memory. That's 5.
+		
+		void example3()
+		{
+			int a = 5;
+			cout << &a << endl;
+		}
+		The code prints out the current addres where a is stored in the stack memory.
+		We get the address of a, instead of its value, by putting an ampersand in front (&a). Notice that this address is one of those hexadecimal numbers. 
+		From this example, you can deduce that any variable in C++ also knows where it lives in memory. 
+
+		void example4()
+		{
+			int a = 5;
+			int* a_ptr = &a;
+		}
+		This code makes a separate variable called a_ptr to store the address of a. Again, we get the address bu using the & (called by reference) sign in front of the variable.
+		This a_pt is a pointer to a. A pointer stores an address in memory where a variable is living. To make a pointer to an inte, we need to add the * to the int type when
+			we declare it. It's easy to misplace & and * at first.
+		
+		void example6()
+		{
+			int a = 5;
+			int* a_ptr = &a;
+			a = a + 1;
+		}
+		We can still change a in the normal way, as in the last line aboe, where it becomes 6;
+		
+		void example7()
+		{
+			int a = 5;
+			int* a_ptr = &a;
+			*a_ptr = *a_ptr + 1; // a is now 6
+		}
+		We can change a by derefercing a_ptr, and we get that by saying *a_ptr.
+		Dereferencing means that we find the address that a_ptr stored there. (it's a little extra work.)
+		
+		void example8()
+		{
+			int a = 5;
+			int* a_ptr = &a;
+			a++;		//	a becomes 6
+			(*a_ptr)++;	//	a becomes 7
+		}
+		This code is similar to example 6 and 7. Firsy we use the ++ operator to increas a by 1, rather than doing a direct addition like + 1.		
+		And then we dereference a_ptr to get a and increase that by 1 again, using the ++ operator.
+		Now you can see how we can change a’s value using either its name or its address. 
+
+		void example9()
+		{
+			int b[4]; 
+			b[0] = 1; 
+			b[1] = 2; 
+			b[2] = 4; 
+			b[3] = 8; 
+		} 
+		We can make a variable that’s an array of integers, instead of one single integer. This code is telling the compiler to find room for 4 integers (that’s what the b[4] does).
+		For arrays, tyhe compiler stores each integer in adjacent locations in memory. After the line int b[4];, 
+			it reserves four integer size blocks, one right after the next, for this array. 
+		Then we can assign to any of those 4 integers, from b[0] to b[3]. Note that arrays in C++ count from 0, not from 1.
+		An array like b, which gets declared with a size in the square brackets ([]), is stuck at its starting size forever.
+		We can change the integers in b[0] through b[3], but we can't change b's size from 4 to something like 10 once we build it with 4 slots.
+		
+		void example5{}
+		{
+			int b[4];
+			b[4] = 5;
+		}
+		Segementation Fault. Outside bounds of the array.
+		
+	Floating Point numbers
+		A 4-byte (single precision) floating point numkber uses:
+			1 bit for the sign,
+			8 bits for the exponent, and
+			23 bit for the binary digits.*
+		An 8byte (double precision) floating point number uses:
+			1 bit for the sign,
+			11 bits for the exponent, and
+			52 bits for the binary digits.*
+		* To a first approximation, anyway. Take 2400 to learn the details.
+		
+	C++ offers you the choice between floats and doubles.
+	Floats in the VM
+		Take up 32 bits of memory, or 4 bytes. 
+		Smallest magnitude: 1.17549e-38 
+		Largest magnitude: 3.40282e+38 
+	Doubles in the VM 
+		Take up 64 bits of memory, or 8 bytes. 
+		Smallest magnitude: 2.22507e-308 
+		Largest magnitude: 1.79769e+308 
+		
+	Like integers, computers store floating point numbers in binary form. Consider these little numbers:
+		Decimal: 0, 0.5, 0.25, 0.125
+		Binary: 0, 0.1, 0.01, 0.001
+	For binary numbers,
+		a 1 in the first place after the decimal (.) is 2-1,
+		and a 1 in the next place is 2-2, 
+		and so forth. All still powers of 2. 
+	Some fimilar numbers don't work out nicel in binary:
+		Decimal: 0, 0.1, 0.333... (1/3), 0.2
+		Binary: 0, 0.000110011..., 0.010101..., 0.00110011...
+	
+1/22/14 - Data Structures and Algorithms Memory Part 3
+	HW1 due Feb 2, Read p.117 - 133 (Skip Recursive Part) for HW1, Skim p.47-64 for description of general bags
+	
+	Floating Point Numbers
+		Like integers, computers store floating point numbers in binary form. Consider these little numbers:
+			Decimal: 0, 0.5, 0.25, 0.125
+			Binary: 0, 0.1, 0.01, 0.001
+		For binary numbers,
+			a 1 in the first place after the decimal (.) is 2-1,
+			and a 1 in the next place is 2-2, 
+			and so forth. All still powers of 2. 
+		Some fimilar numbers don't work out nicel in binary:
+			Decimal: 0, 0.1, 0.333... (1/3), 0.2
+			Binary: 0, 0.000110011..., 0.010101..., 0.00110011...
+		EX: 0.0625 = 0.0001 in Binary
+		EX: 0.375 and 0.75 does not have binary infinite repeats.
+	
+	Arrays
+		void bubbleSort(int theArray[], int n)
+		Suppose you have to write code that sorts an arrya of n integers, like the one above. This is a normal thing to do in this class later on. (Don't worry about
+			the specifics of sorting yet.)
+		Now, suppose you want to adapt this code to sort unsigned ints, or doubles. Normally, you would, need to write 3 different versions of the sorting 
+			code to sort these 3 different types of numbers (int, double, or unsigned int). Yuck.
+			
+	Template Class Sorting
+		template<class ItemType>
+		void bubbleSort(ItemType theArray[], int n)
+		In C++, instead of tying ourselves down to a type, we can define a generic data type (ItemType) and write our code to operate on this ItemType. 
+			Note that this lets us write the sorting code exactly once!
+		When we run this code in a main program, we specify the actual data types in place of the generic ItemType:
+			int main(){
+				string a[5] = {"Z","X","P","K","F"};
+				bubbleSort(a,5);
+				int b[2] = {4, -31}
+				bubbleSort(b,2);
+				double c[3] = {8.6, 8.4, 8.3}
+				bubbleSort(c,3);
+
+			}
+		To be a valid ItemType, the base data type must know how to do cpomparasions like less than (<). That allows use to sort array of strings, or ints, or doubles, or unsigned ints.
+		So any base type with a < operator will be ok here. (This constraint happens because we assume that bubbleSort's using < to do the sorting.)
+		
+		Compiling Generic Class
+			template <class ItemType>
+			void bubbleSort(ItemType theArray[], int n)
+			{
+				...
+				ItemType i[3];
+			}
+		
+		If we compile the C++ code that has the main() function, anf that main() C++ code includes the template C++ code (via #include), 
+			then the template code will compile along with the main code.
+		For HW1, which is a template class, you do something similar: compile ArrayBagTester
+		
+	C++ Classes
+		Classes can capture more complicated behavior
+		Describe a video game character
+			HP? $? Items? Lives? Location? Destination?
+		Level of a video game
+			Map, doors, walls, monsters, traps, goodies
+		Interactions
+			What if another npc is in the same area? or finds a goodie?
+			
+1-23-14 - 
+	C++ Vars to arrays to struct
+		You've seen how single varibles (int, double) work and how arrays of those vars work.
+		You've seen generic vars (ItemType) work singly and in arrays.
+		To describe more complex problems, we can stick a bunch of vars together into something called a struct.
+			For instance, a student in 2270 could be described using her name (a string), ID number (an int), and course grade (double)
+				studen s;
+				s.name = "Zorro";
+				s.id = 800292663;
+				s.grade = 0.75;
+				
+		Structs are still not ideal, though. This all looks ok, but how about those member variables now?
+			s.name = "~%6*!";
+			s.id = -5;
+			s.grade = -900;
+		We can't just let people set these values to anything.
+		
+		What we'd like better is for the struct to have member functions that make sure its memver variables are set to correct values.
+		How would you check if a student id is a valid numver?
+		How would you check if the student name is valid?
+		A struct that includes these members functions is called a class.
+		
+		Big idea here: 
+		
+		Consider for a moment the relationship between a TYPE AND AN INSTANCE. One example of a type is an int (which decribes a set of possible integer numbers).
+			int a = 5;
+			int b = -2212
+			
+		Your classes, like ArrayBag, are also types; They're just bigger and more complicated types than integes, booleans, or other 'primitive' types in programming languages.
+			When you classes construct new objects:
+				ArrayBag<int> oscar;
+		Those objects you're making are isntances whose type is your class. oscar's just one of all the possible ArraysBags in the world you could have created here.
+		Class instances are called objects.
+		
+		Designing Classes are hard. We'll start out with a somple class, called a bag.
+			Bag class: stores a collection of things
+				unsorted, for nw
+				finite capacity, for now
+			Bag knows how to:
+				create itself, empty itself, add items, remove items, list all contents, count contents, tell item present in contents, tell how many copies
+			
+		Notice that nothing in the bag description is specific to C++: this is just a list of things we expect.
+		
+		How we decide to program those baggy behaviors is much more specific, because we have to commit to a particular way of writing bags.
+		You know that a list of behaviors for a class, at the highest level, is called an interface. How we program those behaviors specifically is called the class implementation.
+		
+		What is so important about this distinction?
+		Interfaces are like contracts you make with the user of your code. You promise, for example, that bags will store items and not forget them.
+		Implementation is considered the programmer's private business. As long as user thinks 
+		
+		Interface: BagInterface
+		
+1-27-14
+	Read Pg. 31-46 on C++ Classes
+	HW1 due Sunday.
+	
+	Function Parameters by Reference
+		void fun1(int bobo){ bobo *= 2;}
+		void fun2(int& bobo){ bobo *= 2;}
+		// void fun3(const int& bobo){ bob *= 2;} // Doesn't work, trying to change the value of bobo when it must remain constant
+		void fun3(const int& bobo){ cout << " I'm bobo " << bobo << endl; }
+		int main()
+		{
+			int homeslice = 6;
+			fun1(homeslice);			// Homeslice is copied to fun1, and the copy doubles.
+			cout << homeslice << endl;	// No change, original homeslice abides...
+			fun2(homeslice);			// Address of homeslice is copied to fun2 and value at address is doubled
+			cout << homeslice << endl; 	// Homeslice is now doubled
+			fun3(homeslice);
+		}
+		
+		Passing in an address to a variable can befaster than passing a copy. But passing in an address also risks exposing the variable to changes.
+		If we pass the address in as a constant reference, we get the speed and the protection for our variable:
+			void fun3(const int& bob)
+		The compiler will actually refuse to build this code at all, because it's breaking the promis (that we made with a const int&)
+		
+		As long as our fun3 code does not change bobo, it will compile and run just fine.
+		
+	Class, Array, Vars, Structs
+		Single Variables, Arrays of Variables, Structs (A bunch of different variables, stuck together to make a new data type),
+		Classes (With different Variables, but now with member functions to change theme in proper ways.)
+		
+	Types of Instances
+		We also talkeed about the relationship between types and instance. The type of a var determines the set of values that each varible instance can have.
+		Below, the types are double and bool, and the instance are n1 and done.
+			double n1 = 1/3.0; // 0.3333... is allowed
+			bool done = false; // only 2 values allowed here
+		Both C++ and Java are fairly strict about types, especiallt when assigning or converting between types
+			Exception is generic data types (ItemType)
+		
+		When we make a var whose type is a class, like:
+			ArrayBag<string> papas_brand_new_bag;
+		We can think of the class ArrayBag as being a type and the varible papa as being an instance of the ArrayBag class.
+		But the convetion dicatates that we usually call the var an object if its type is a class.
+		So types define instance and classes define objects. It's the same relationship, with different names.
+	
+	Bag Class Constructor
+		Makes a new empty bag, initializes it. Check ArrayBag.h and notice that the item array is built.
+		
+		Make a new empty
+		
+	Bag Size Functions
+		getCapacity: returns the current capacity of the bag
+		getCurrentSize:	returns the current number of items within the bag.
+		isEmpty:
+			if(itemCount == 0) return true;
+			else return false;
+			or..
+			return(itemCount == 0);
+		
+1-29-13 - 
+	Const Functions
+		Notice that several of the member functions are makred const at the end:
+			bool ArrayBag<ItemType>::isEmpty() const
+		These functions are promising not to change the member variable of the bag. Why can they do that?
+		We do this to make our code safer; accidental changes to the bag get recognized and stopped at compile time.
+		
+		Notice that other member functions have const input parameters:
+		What are we promising here? The item we add or remove must not change. (The bag changes, but the item just gets put into the items array.) 
+		Again, this protects against programme errors.
+			
+	Adding Items
+		bool ArrayBag<ItemType>::add (const ItemType& newItem)
+		{
+			Empty Bag of ints, Default_Capacity = 6, itemCount = 0,
+			Adds an item, itemCount becomes 1,
+		}
+		
+		Can we generalize this to any available slot in the Bag?
+			items[?] = newItem;
+			itemCount++;
+			return true;
+		Can we do it all in one line? Yes...
+			items[??] = newItem;
+			return true;
+		What if the Bag is full?
+			Add nothing and return false
+		Segmentation Faults?
+			Check those indexes! Count from 0.
+			
+		items[itemCount++] = newItems;
+		items[++itemCount] = newItems;
+		
+	Find Items
+		How can we tell if the Bag does not contain an item?
+		If we assume
+		
+	Removing Items
+		items[q] = items
+		
+1-31-14
+	Removing Items
+		If the bag were an ordered collection of items, what would be bad about this gap filling plan?
+		How would we preserve order while removing item in the bag, if we had to? (Not in HW1 or HW2)
+		How much work does preserving the order take, compared to what we did in the previous slides?
+		What would we have to watch out for here?
+	
+	Listing Items
+		Create an empty vector (another array-like template class in C++)
+			vector<ItemType> itemList;
+		Write a loop: for each item in the item array, add it to the itemList vector using a line like this ( with no ?)
+			itemList.pushback(items[?]);
+		Seems a little redundent, no?
+			We using an array to store data anway
+			Later, when you write a B-tree container class,	this routine will let you make a list from its item even 
+				if they're not stored in a linear way; then it will seem more useful
+		
+		How do we decide if 2 bags were equal?
+			Two bags, containing the same amount of items of the same things (just in different order), are the same.
+		
+	Pointer
+		void ex8()
+		{
+			int a = 5;			// Integer
+			int* a_ptr = &a;	// Pointer to Integer
+			a++;				// a + 1
+			(*a_ptr)++;			// a + 1
+			a_ptr++;			// ?!
+		}
+		
+		In C++, you can increment pointer addresses using + (or decrement them with -)
+			int* c = new int[10];
+			for(int q = 0; q < 10; q++)
+				c[q] = q;
+			count << c[5] << endl;			// prints 5
+			count << c[0] + 5 << endl;		// also 5
+			count << c[9] - 4 << endl;		// also 5
+			
+		Specify: Where to start copying, where to stop copying, and destination
+			int* c = new int[10];
+			for(int q = 0; q < 10; q++)
+				c[q] = q;					// c: 0 1 2 3 4 5 6 7 8 9
+			int* d = new int[10];
+			copy(c, c+5, d);				// d: 0 1 2 3 4
+			copy(c, c+5, d+5);				// d: 0 1 2 3 4 0 1 2 3 4
+			
+	The new command
+		You can create vars in place other than the local memory... like the heap. you use the new command to do this.
+			// Define an integer equal to -8 on the heap
+			// Make a hold the address of this -8
+			int* b = new int(-8);
+		Notice, here, that the var with the value of -8 has no name. We only have a pointer to this value, which is a.
+
+		void lecture_8_ex_4()
+		{
+			int a = -4;
+			int* b = new int(-8);
+		}
+		The nameless -8 that lives on the heap, however, is not destroyed.
+		
+		Look heap var like this this uses up memory; we sometimes call it a memory leak.
+		We could rewrite this example so it didn;t lose the pointer to the -8 but instead returned that pointer:
+		int* ex5()
+		{
+			int* b = new int(-8);
+			return b;
+		}
+		Since we return the pointer to the -8 here,
+		
+		We could rewrite this example so it passes the pointer by reference:
+		void ex6(int* &8)
+		{
+		}
+		
+	Delete Command
+		To give back a heap of var memory, we use the delete command:
+			int* = new int(-8);
+			delete a;
+			
+			int* nummies = new int[10];
+			delete [] nummies;
+		
+	HW2
+		In the next hw, we'll make the bag expandable, so it can upsize as needed to hold more items.
+			First big chance:
+				ItemType items[DEFAULT_CAPACITY];
+			becomes
+				ItemType* items;
+		So items becomes a pointer to an (as of yet) array of items
+		
+		Second change: your constructor
+			Your constructor must make the array, using new:
+				items = new ItemType[myCapacity];
+			After this, items is a pointer to an array on the heap. 
+			This means that items is the address of the firsy item in the array.
+			Your constructor also need to keep track of
+			
+		delete [] items;
+		
+		4th: You will need to add a new method clled resize() to the bag. When you items array gets full, this m ethod will:
+			Make a new item array, twice as big as the old one
+			Copy all the items from the old items array to the new items array
+			Delete the old items array
+			set items = new item array
+			update myCapacity to the new array size.
+			
+2/3/2014
+	#include <stdio.h>
+	#include <stdlib.h>
+	
+	int main()
+	{
+		return EXIT_SUCCESS;
+	}
+	
+	public class identifier
+	{
+		public:
+			
+		private:
+			
+	}
+	
+	Public
+		
+	Private
+		
+	Bit
+		
+	Byte
+		
+	Shallow Copy
+		A pointer that references the same instance within an memory.
+	Deep Copy
+		A seperate instance that is within it's own reservation in memory.
+	Stack
+		Statically Addressible Memory
+		Student Peter("Peter", 1);
+	Heap
+		Dynamically Addressible Memory
+		new command
+		ex: Student Pete = new Student("Peter", 1);
+			Student array = new student[2];
+		
+2-5-14
+	HW 2 due weekend, read pg.152-154, 178-184 on Bag resizing
+	
+	Void ex8()
+	{
+		int a = 5;
+		int* a_ptr = &a;
+		a++;
+		(*a_ptr)++;
+		a_ptr++;
+	}
+	
+	int* c = new int[10];
+	// add a val for array parts
+	cout << c[5] << endl;
+	
+	You can create vars in place other than the local memory like the heap. You use the new command to do this.
+		// Define an int(-8);
+		int* b = new int(-8);
+		delete b;
+	To give back a heap memory, we use the delete command, for array we add [] to the delete command	
+		int* c = new int[8];
+		delete [] c;
+		
+	In the next Hw, we'll make the bag expandable, so it can upsize as needed to hold more items.
+	First big change:
+		ItemType items[DEFAULT_CAPACITY];
+		becomes
+		ItemType* items;
+	So items becomes a pointer to an array pointer.
+	
+	Second change:
+		items = new ItemType[myCapacity];
+		After this, items is a pointer to an array on the heap.
+		Your constructor also needs to keep track of the current capacity of the bag.
+		
+		ArrayBag(int capacity = DEFAULT_CAPACITY);
+		ArrayBag<ItemType>::ArrayBag(int capacity);
+		
+		ArrayBag<int>aBag(6);
+		ArrayBag<int>aBag(); // Default Capacity
+		
+	Third Change
+		Destructor
+		delete [] items;
+		~ArrayBag(); // Destructor call
+		
+	Fourth Change		
+		resize(int newCapacity)
+		Make a new item array bigger than the old one,
+		Copy all the items from the old items array to the new items array
+		Delete the old items array
+		Set items = new items array
+		Update myCapacity to the new array size.
+		
+	Copy Constructor
+		You will write a new constructor that initializes a Bag as a copy of another bag.
+		ArrayBag(const ArrayBag& anotherBag); // copy constructor
+		// Update itemCount to be anotherBag's itemCount
+		itemCount = anotherBag.getCurrentSize();
+		myCapacity = anotherBag.getCapacity();
+		items = new ItemType[myCapacity];
+		// loop to copy each item from itmes to new_items
+		for(int l = 0; k < itemCount; ++k)
+			items[k] = anotherBag.items[k];
+		
+		ArrayBag<int>frodo;
+		frodo.add(5); frodo.add(-2);
+		ArrayBag<int> bobo = frodo;
+		
+	Shallow Copy
+		The same exact shared type/object within memory.
+	
+	The this pointer
+		Every object you make knows where it's stored in memory. That address is called this.
+		We can dereference the this pointer of an object(*this) to get the object itself back
+		We can also use the this pointer itself to figure out weird vases where our code will be wacky.
+		For memory, they must be the sam object! We do this when checking for self assignment.
+	
+	Sixth Change
+		Operator =
+		Add an assignment operator to assign one Bag to another.
+		ArrayBag& operator = (const ArrayBag& anotherBag); 
+		// Assignment Operator
+		Check if we're self assigning using the address at this; if we are, return *this;
+		If we're not self assigning, delete our existing items array
+		Set our myCapacity and itemCount
+		Then make a new items array with the capacity of anotherBag and copy the items from anotherBag
+		Then return *this
+		
+	Underwear test
+		if(&anotherBag == this)
+			return *this;
+			
+2-7-14
+	What functions will only have a little change?
+		getCapacity()
+		isFull()
+		add()
+		
+	Every object you make knows where it's stored in memory. That address is called this.
+	We can dereference the this pointer of an object (*this) to get the object itself back.
+	We can also use this pointer itself to figure out weird cases where our code will be wacky. For instance, if 2 objects occupy the same address in memory,
+		they must be the same exact object. We do this when checking for self assignment.
+		
+	ArrayBag<string> aBag;
+	aBag.add("");
+	ArrayBag<string> fruitBag = aBag;
+	Array<ItemType>::ArrayBag(const ArrayBag<ItemType>& anotherBag)
+	{
+		itemCount = anotherBag.itemCount;
+	}
+	
+	anotherBag.itemCount = itemCount;	// Bad.
+	
+	Overwriting an already created bag containing contents will overwrite the bag, recreating it into a copy of the bag's new reassignment with =
+	bBag = aBag
+	ArrayBag<ItemType>& ArrayBag<ItemType>::operator=(const ArrayBag<ItemType>& anotherBag)
+	aBag would be anotherBag in this case.
+	
+	At the end of the code, suppose that bBag gets automatically destroyed by the destructor, and its items array is released back into the wild memory.
+	Then aBag gets destroyed. What happens? A seg fault, due to it destroying bBag, then tries to destroy aBag, which is bBag.
+	
+2/12/14
+	First midtem monday 2-2:50
+		Open book/note
+		No electronics
+		Review sheet posted
+		Bring questions to class Friday.
+		
+	We defined you class in C++ in 3 parts:
+		BagInterface.h
+		ArrayBag.h
+		ArrayBag.cxx
+	none of these compiled without the test code
+		ArrayBagTester.cxx
+	
+	template<class ItemType>
+	class BagInterface{ ... }
+		Defines one bag ancestor class, BagInterface, with a set of empty public methods, like
+			virtual bool add(const ItemType& newEntry) = 0;
+		Think of these methods as the core set of functions a user expects from any sort of Bag
+		In 
+	
+	Remember the BagInterface class name
+	ArrayBag is defined as decendant of the BagInterface here, after the colon:
+		template<class ItemType>
+		class ArrayBag: public BagInterface<ItemType>
+	The public keyword here means anthing defined as public is also public in ArrayBag (and private is private in ArrayBag)
+	
+	With those virtual functions, if ArrayBag.cxx doesn't implement them, the compiler complains.
+	
+	In C++, it's conventional to make a split in a class definition, for 2 reasons:
+		It's a clumsy way to seperate the interface for the function (what it does) from its implementation (how it does that).
+		Clumsy because the class member variables are exposed in the header, as are private functions; too much information for an inteface.
+		It allows any other files that use this class to compile with implicit trust that this class and its methods exist (the implementation code is finally included later in
+		a final compliation step called linking.)
+		
+	How did ArrayBagTester.cxx get everything to compile?
+		ArrayBagTester calls all files together within the compiler, which then correlate into a program.
+		
+	Macro Guards
+		ArrayBag.h and BagInterface.h contain macro guards,
+			#ifndef _ARRAY_BAG
+			#define _ARRAY_BAG
+			
+			#endif
+		Why? it's perferctly likely tht 2 files in a project might #include the same header file (and this might well be needed for them to compile in c++).
+		But the compiler freaks out if it sees a function or class being defined twice! (it doesn't know which one you mean it to use.)
+		
+		This first time the compiler sees ArrayBag.h, it checks if it has a variable called Array_Bag defined. If it's needs/seen ArrayBag.h before in the compilation, this variable
+		is not defined, so #ifndef _ARRAY_BAG (which means if _ARRYA_BAG is not defined) return true. This lets the code define _ARRAY_BAG for the first time, and
+		read in the header file.
+		The #endif marks the end of the compiler's #ifndef.
+		
+2/14/14
+	Abstract Class
+		ex: BagInterface.h
+		Has virtual functions, but has implementations along with the virtual functions
+	Virtual Template Class
+		ex: An extension of an abstract. Can be reformed into children classes
+	
+		#include <iostream>
+		using std;
+	
+		class Animal {
+			public virtual eat();
+			public virtual kill();
+		};
+	
+		class Human : Animal {
+			public void think()
+			{
+				cout << "LOL" << end; // Now an abstract class
+			}
+		};
+		
+		class Male : Human {	// Human extends animal class, male extends human.
+			public virtual pee_standing_up();
+			void think()			// Overload the function
+			{
+				cout << "ROFL" << endl;
+			}
+		};
+		
+		int main()
+		{
+			Male m = new Male();
+			m.think();
+			Human h = new Human();
+			h.think();
+			Animal * a;
+			a = new Male();
+			a.think();
+		}
+		
+	Polymorphism - Changes parent class into child class
+		A, goes from animal to male human.
+		child classes cannot become parent classes.
+		
+		Class Ball{
+			int x, y;
+			virtual void bounce();
+			void move(){
+				x += 1;		// This function turns class into an abstract class, since it implements individuality.
+				y += 1;
+			}
+			virtual void roll();
+			Ball()
+			{
+				x = 1
+				y = 1;
+			}
+		};
+		
+		class Football : Ball
+		{
+			// IMPLEMENT
+			void bounce()
+			{
+				y += 1;
+			}
+			void roll()
+			{
+				x += 1;
+			}
+		}
+		
+		int main()
+		{
+			Football f = new FootBall();
+			Ball * b = new FootBall();		// Same behavior
+			// Ball * a = new Ball();		// Not all implementation are complete, so this will output an confliction error
+		}
+		
+	Constructors are inherited. They gain all method inheritence from their class parent.
+		ex: Ball class, Football gains Ball constructor.
+				If football has a unique constructor, that is/can be called
+	
+	Classes can have multiple parents, but it is unethical programming and breaks the structure of programming.
+	Child functions take precedence.
+	
+	One-to-one relationships
+		The ability of one class to use another class.
+		
+		class Male :: Human
+		{
+			public void pee_standing_up();
+			void think()
+			{
+				cout << "ROFL" << endl;
+			}
+			Ball * b;		// 1-to-1
+			
+		}
+	
+		int main()
+		{
+			Male m = new Male();
+			m.think();
+			m.b = new FootBall()
+			m.b.roll();
+		}
+		
+1-19-14
+	How to compute factorial of a positive integer n?
+		Loop
+			unsigned in factorial_1(unsigned int n)
+			{
+				unsigned int answer = 1;
+				unsigned int counter = n;
+				while (counter > 0)
+					answer *= counter--;
+				return answer;
+			}
+		
+		Recursion
+			unsigned int factorial_2(unsigned int n)
+			{
+				if(n < 2)
+					return 1;
+				else
+					return n * factorial_2(n-1);
+			}
+			
+			Recursive functions call themselves
+			Problem has to get smaller in each recursive call.
+			
+			Recursive factorial is not so high preformance
+				Recurive calls cost time
+				recursive functions with local vars cost lots of space
+			But other recursive methods are very useful.
+				Binary search of sorted array
+				Solution to Towers of Hanoi problem
+				Quicksort/Heapsort/mergesort to soret arrays
+				Processing fractals: Koch snowflake, sierpinski triangle
+				
+		Searching an array for an item
+			How do we tell if an unsorted array of n items contains a particular item?
+				When can we stop early? (Like ArrayBag's contains)
+				When would we have to look at all the items
+				If there are n items, this takes 0(n) times
+			Would this become faster if the array were sorted smallest to largest?
+				When can we stop early?
+				When would we have to look at all items?
+				If there are n items, this takes 0(n) time
+			Can we do better?
+			
+2-21-14
+	Longest Common Subsequence
+		If we have 2 strings, how similar are they?
+		What if we answer by counting all the letters?
+			Is "man bits dog" equal to "dog bites man"?
+		What if we take order into account?
+			BANANA vs. NANA
+		This algorithm is used to compute genetic similarity (BLAST)
+	
+		This is a problem for a 2D array!
+		- - B A N A N A
+		- 0 0 0 0 0 0 0
+		N 0 ? ? ? ? ? ?
+		A 0 ? ? ? ? ? ?
+		N 0 ? ? ? ? ? ?
+		A 0 ? ? ? ? ? ?
+		Note: Array has one extra row and column, filled with 0s.
+		
+		string a = "BANANA";
+		string b = "NANA";
+		int** lcs_array = new char*[length(b) + 1];
+		for(int k = 0; k < length(b) + 1; k++)
+			lcs_array[k] = new char[length(a) + 1];
+		
+		Now we fill in the table according to this rule:
+			If there's a cell in the array at row i and colume k, and the letters of string b[i-1], column j;
+				the number of row i, colume [j-1]; or 1 + number in row(i-1), column (j-1)
+		- - B A N A N A
+		- 0 0 0 0 0 0 0
+		N 0 0 0 1 1 1 1
+		A 0 0 1 1 2 2 2
+		N 0 0 1 2 2 3 3
+		A 0 0 1 2 3 3 4
+		
+2-24-14
+	HackYourApp: Hackathon
+	Read Chapter 4, recursion; focus on factorial and binary search sections for now
+	
+	- - B A N A N A
+	- 0 0 0 0 0 0 0
+	N 0 0 0 1 1 1 1
+	A 0 0 1 1 2 2 2
+	N 0 0 1 2 2 3 3
+	A 0 0 1 2 3 3 4
+	Backtraking to get the match is harder:
+		B A N A N A
+		- - N A N A
+	
+	string a = "BANANA";
+	string b = "NANA";
+	int** lcs_array = new char*[length(b) + 1];
+	for(int k = 0; k < length(b) + 1; k++)
+		lcs_array[k] = new char[length(a) + 1];
+	for(int k = 0; k < length(b) + 1; ++k)
+		delete [] lcs_array[k];
+	delete [] lcs_array;
+	
+	- - B O N O B O
+	- 0 0 0 0 0 0 0
+	B 0 1 1 1 1 1 1
+	O 0 1 2 2 2 2 2
+	B 0 1 2 2 2 3 3
+	O 0 1 2 2 3 3 4
+	Backtracing the match is harder (multiple matches can happen)
+		B O N O B O
+		B - - O B O
+		OR
+		B O N O B O
+		B O - - B O
+	
+	Longest common subsequence
+		Real sequence data is hundreds to millions of letters long
+		These 2d tables can get huge
+		What if we has to aling 3 strings?
+		
+	Exam ANSWERS
+	1) Pointers! Track this code and tell me what it prints for a, b , and c in the the last line.
+		63 63 63
+	2) 	if (isEmpty)
+			return false;
+		biggestitem = items[0]
+		for(int k = 0; k < itemCount; k++)
+			if(items[k] > biggestItem)
+				biggestItem = items[k];
+		return true;
+	3)	ArrayBag<ItemType> destructThis = *this;
+		ArrayBag<ItemType> destructAnotherBag = anotherBag;
+		if(destructAnotherBag.isEmpty() && destructThis.isEmpty())
+			return true;
+		if(destructAnotherBag != destructThis)
+			return false;
+		while (destructAnotherBag.isEmpty() == false && destructThis.isEmpty() == false)
+		{
+			ItemType biggestItem1, biggestItem2;
+			destructThis.biggest(biggestItem1);
+			destructAnotherBag.biggest(biggestItem2);
+			if(biggestItem1 != biggestItem2)
+				return false
+			destructThis.remove(biggestItem1);
+			destructAnotherBag.remove(biggestItem2);
+		}
+	4)
+	5) 	a. Larry unchanged
+		b. Eddie, larry unchanged fred change
+		c. Ted can change, eddit can, larry can't
+	6) 
+	
+2-26-14
+	Read chapter 4
+	
+	Writeups of the seminars, 6 double spaced pages, by email, plus a couple of references to journals or magazines, and at least half of this paper should talk about your
+	reaction to the work. Tell me something interesting that you learned.
+	
+	BigNum numbers
+		We store these digits backwards, which is really handly later. Don't Store them in forwards order (it's too much work for us to debug)
+		Watch the odd behavior of unsigned ints (and don't even think of changing these to regular ints; that's not allowed)
+		
+		BigNum a;
+		BigNum b = 786;
+		BigNum c = b;
+		BigNum d = (string) "928787";
+		c = a;
+		b = b;
+		
+	786 % 10 = 6
+	786 / 10 = 78
+	
+	a == b	return (!(a == b))
+	a < b	return((a<b)||(a==b))
+	
+	
+3-3-14
+	HW3 Part 1, due 3/8, Part 2, 3/17
+		Constructor
+		Destructor
+		Assignment operators
+	
+	
+	Why do we need a new class for bigger numbers?
+		Limitations on ints, on 64 bit ubuntu vm, ints can represent a limited amount of positive and negative numbers. You can determine the limits on your
+			own system by plugging the following lines into your code:
+			
+			#include<limits.h>
+			// These will need to go into a main function to compile
+			cout << "MIN int: " << INT_MIN << endl;
+			cout << "MAX int: " << INT_MAX << endl;
+			
+		What if we need to represent a bigger number though? Enter BigNum.
+		
+	[1][0][0][][][][][] ...  <- 0-9 in each array slot. numSize(int)
+	
+	A friend is not a member of the class, it just allows access to private variables and functions within a class.
+	Left Hand Side LHS - Left of an operator, RHS = Right of an operator.
+	
+	std::ostream& operator<<(std::ostream &os, const BigNum& bignum)
+		for(length(bignum))
+		{
+			os << bignum.array[i];
+		}
+		return os;
+	
+	BigNum operator==(a, b)
+		bool equal = true;
+		if(a.positive == b.positive && a.array == b.array)
+			return true;
+		else
+			return false;
+	!=
+		if(a==b)
+			return false
+		else
+			return true;
+	
+	BigNum::Sum
+		
+3-5-14
+	ostream& operator <<(ostream &os, const Object& instance){
+		os << "WHAT IT SAYS WHEN USING << " << endl;
+	}	// Overloads << in output stream, teaches class object how to interact with cout.
+	
+3-7-14
+	std::istream& operator>>(std::istream &is, BigNum& bignum)
+	{
+		string a;
+		is >> a;
+		
+		Bignum temp = Bignum(a);
+		bignum = temp;
+		
+		return is;
+	}
+	
+	int main()
+	{
+		Bignum a;
+		cin >> a;
+	}
+	
+	// Link lists
+	class LinkedList
+	{
+		node *head
+		// node *tail
+	}
+	
+	class node
+	{
+		int data;
+		node* next;
+	}
+	
+	int main()
+	{
+		LinkedList l = new LinkedList();
+		node* n1 = new node(1);
+		node* n2 = new node(2);
+		node* n3 = new node(3);
+		l->head = n1;		// OR (*l).head = n1;
+		n1->next = n2;
+		n2->next = n3;
+		
+		l->head->next = n2; // Or n1->next = n2;
+		
+		node* temp = n2;
+		// for(temp = head; count < NUM_ELEMENT; iterate)
+		//int count = 0;
+		for(temp = head; temp->next != null; temp=temp->next)
+		{
+			//count++;
+		}
+		
+		temp->setNext(n4);
+		
+		// l.append();
+	}
+	
+3/10/14 - Linked Lists
+	BigNum
+		+= Operator
+			*this = *this + anotherBigNum;
+		+ Operator
+			BigNum result = *this;
+			result += anotherBigNum;
+	Exam 2
+		Multiple Choice
+		Expect a scantron format
+		Review sheet tomorrow.
+		Not likely to be easier
+		
+	Linked Lists Node Class
+		Linked lists depend on a node class
+		
+		template<class ItemType>
+		class Node
+		{
+			private:
+				ItemType item;			// A data item
+				Node<ItemType>* next;	// Pointer to next node
+			...
+			
+			public:
+				// 3 Constructors
+				Node();
+				Node(const ItemType& anItem);
+				Node(const ItemType& anItem, Noce<ItemType>* nextNodePtr);
+			...
+			
+			void setItem(const ItemType& anItem);
+			
+			
+			...
+			
+		}
+		[Head_Ptr]-->[2nd]-->[3rd]-->[4th]-Null
+		
+		Node<string>*head_ptr;	// Node* used in list, not Node
+		head_ptr = new Node();
+		// OR
+		head_ptr = new Node<string>("Frodo");
+		// OR
+		head_ptr = new Node<string>("Gollum", head_ptr);
+		
+		
+		Node<ItemTpye>* curr = head_ptr;
+		while (curr != nullptr)		// while(curr != NULL)
+		{
+			cout << curr->getItem() << endl;
+			curr = curr->getNext();
+		}
+		
+3-12-14
+	List is Built of Node pointers
+		template<class ItemType>
+		class LinkedBag
+		{
+			private:
+				Node<ItemType>* head_ptr;
+				...
+			public:
+				...
+				bool add()
+				contains
+				remove
+		} // End LinkedBag
+		
+		Empty list has head_ptr = nullptr and nothing else
+		
+	Add
+		Empty list:
+		if(head_ptr == nullptr)
+			head_ptr = new Node<ItemType>(newEntry);
+		Non-empty list:
+		else
+			head_ptr = new Node<ItemType>(newEntry, head_ptr);
+			
+	Contains
+		Contains loops over all the nodes
+		Node<ItemType>* curr = head_ptr
+		while(curr != nullptr_
+		{
+			if(curr->getItem() == anItem)
+				return true;
+			else
+				curr = curr->getNext();
+		}
+		return false;
+	
+	Remove
+		remove() reroutes the pointers around the removed item
+		Must delete the removed node as well since nodes are created with new
+		
+		// Check if list is empty
+		if(head_ptr == nullptr)
+			return false; // Empty list
+		// Checks if item to remove is at head
+		If(head_ptr->getItem() == anItem)
+		{
+			Node<ItemType>* to_delete;
+			to_delete = head_ptr;
+			head_ptr = head_ptr->getNext();
+			delete to_delete;
+			return true;
+		}
+		
+		// Look for the node before the one to delete
+		Node<ItemType>* curr = head_ptr;
+		// for(curr = head_ptr; curr != nullptr && curr 0> getNext() != nullPtr; curr = curr->getNext())
+		while(curr != nullptr && curr 0> getNext() != nullPtr)
+		{
+			if(curr->getNext()->getItem() == anItem)
+			{
+				Node<ItemType>* to_delete = curr->getNext();
+				curr->setNext(to_delete->getNext());
+				delete to_delete;
+				return true;
+			}
+			curr = curr->getNext();
+		}
+		
+		
+3/14/14
+	Review
+	8)	Set bignum positive value to true.
+	9)	Node<ItemType>* curr = head_ptr;
+		while(curr != nullptr)
+		{
+			cout << curr->getItem() << endl;
+			curr = curr->getNext();
+		}
+	11)	for(curr = head_ptr; curr != nullptr; curr = curr->getNext())
+	
+	for(curr = head_ptr;  curr != nullptr; curr = curr->getNext()->getNext()->getNext()->getNext()->getNext())	// No
+	// Condition in the for loop must use the && with addition conditions for the next five indexs
+	curr != nullptr && curr->getNext() != nullptr && ...
+	
+	12) Make a larger array in memory and copy all things from the old array into the new one.
+	
+	
+303-492-5854
+UFLT
+FLAT
+
+3/19/14
+	BigNum part 2 due Friday
+	Linked List Pitfalls
+		Failing to check node pointers for nullptr
+		if Node<ItemType>* curr is equal to nullptr, then
+			curr->getNext() blows up
+			curr->getItem() blows up
+			delete curr blows up
+		Forgetting to delete nodes (memory leaks)
+		Forgetting to take connections between nodes into account
+			Disconnects bits of your list (also causes memory leak)
+	Linked List vs array
+		Arrays are faster for random access []
+			easy to get the 8th element in the array
+			list has to count to the 8th element from the head_ptr
+		List can be faster for add/remove, especially when sorted
+			List re-routes pointers around the added.removed item
+			Array has to shift all items up or down to preserve order
+		If you plan to add and remove a lot from the Bag, use a list.
+		If you plan to look up a lot of items in the Bag, use an arrays.
+	Destroying linked lists
+		We can't just say
+			delete head_ptr;
+		Because then we leak memory for the remaining nodes
+		We've got to delete from the front to get the whole thing...
+			while(head_ptr != nullptr)
+			{
+				Node<ItemType>* to_delete = head_ptr;
+				head_ptr = head_ptr->getNext();
+				delete to_delete;
+			}
+		As in remove, we still have to keep track of the remaining nodes in the list.
+	Copying linked lists
+		Copying from one linked list to another
+			LinkedBag& LinkedBag::operator=(const LinkedBag& source)
+		check first for self assignment
+			if(this == &source)
+			{
+				return *this;
+			}
+		Check next for empty lists
+			if(source.head_ptr == nullptr)
+			{
+				head_ptr = nullptr;
+				return *this;
+			}
+		If we say
+			head_ptr = source.head_ptr;
+		What kind of copt do we get?
+		
+		LinkedBag& LinkedBag::operator=(const LinkedBag& source)
+			// If the list is not empty, then we copy the head first:
+			head_ptr = new Node()
+			
+			// Noew we need a loop to copy the rest
+			const Node<ItemType>* source_curr = source.head_ptr->getNext();
+			Node<ItemType>* curr = head_ptr;
+			while(source_curr != nullptr)
+			{
+				curr->setNext(new Node<ItemType>(source_curr->getNext()));
+				curr = cur->getNext();
+				source_curr = source_curr->getNext();
+			}
+	Const Node Pointers
+		We'd get this behavior by writing 2 getNext() methods.
+			const Node<ItemType>* getNext() const{return next;}
+			Node<ItemType>* getNext() {return next;}
+		
+		const Node<ItemType>* curr = head_ptr;	// const node
+		while(curr != nullptr)
+			curr = curr->getNext()
+			
+	HW4
+		Doubly linked list node class
+		Illustrated as a way to store polnomials
+			p = 3x^0 + 4.5x^6 + 0.9x^14
+		private:
+			double coef_field;
+			unsigned int exponent_field;
+			
+	Polynomial as DLL
+		Makes a node for the x^0 term
+			even if its coeff is 0
+			so no poly has an empty list.
+		After that, each polynomial stores on-zero coefficients of higher powers of x, in order of increasing exponents
+	
+	head_ptr -> [Coef,expo,fore,back:NULL] -> [Coef,expo,fore,back:head_ptr] -> ...
+	
+	Doub Linked list efficiencies
+		Double links lets us zoom backwards through the list
+		
+3/21/14
+	Doubly linked list efficiencies
+		Double links let us zoom backwards through the list
+		Along with head_ptr, we keep a pointer to the last node in the list(tail_ptr)
+		We keep a pointer to the most recently toouched node in the list (recent_ptr)
+			Having this makes our list a little faster
+			This is a mutable var; recent_ptr is allowed to change.
+			
+	Polynomial functions involving memory (part 1)
+		The usual suspects
+			default constructors
+			copy constructors
+			operator =
+			destructor
+		Operations to change a term may also change memory
+			assign_coed(coef, exponent)
+			add_to_coef(coef, exponent)
+			
+	Other operators for part one
+		set_recent(exponent)
+		coefficient(expo)
+		next_term(expo)
+		prev_term(expo)
+		
+	Polynomial math functions for part 2
+		Basic arithmetic
+			Operator + - *
+			eval() for evaluation
+			deriv()	for derivative
+			Root extra credit; use newton's method, find x that makes the polynomial evaluate to 0
+	Root
+		Start with initial guess for X0
+		update xn+1 = xn - f(xn)/f'(xn)
+		Stop when f(xn) is close to 0; xn is not your root
+		Does not always find solution
+		Watch out for one problem that will trip you up if you forget it
+		
+	Default Constructor
+		Uses default arguments: if you don't supply them, they're 0
+		See poly.h fr the default arguments:
+			polynomial(double c = 0.0, unsigned int exponent = 0)
+		Consider these cases:
+			c == 0.0, exponent == 0		// 1
+			c != 0.0, exponent == 0		// 2
+			c == 0.0, exponent > 0		// 3
+			c == 0.0, exponent > 0		// 4
+		Comparing integer exponents is easy (use ==)
+		Comparing floating point coefficients is hard (error piles up)
+			if(fabs(c) < EPSILON)
+			
+		cases:
+			head_ptr = new polynode(0,0);	// 1
+			head_ptr = new polynode(c,0);	// 2
+			head_ptr = new polynode(0,0);	// 3
+			head_ptr = new polynode(0,0);	// 4
+				head_ptr->set_fore(new polynode(c, exponent));
+				head_ptr->fore()->set_back(head_ptr);
+		set recent_ptr, tail_ptr, current_degree
+		
+	Destructor:
+		Write and use the clear() function, which sets a polynomial to a zero-exponent, zero-coeffient, single node again
+		Then delete that node
+		see example for the singly linked list from Wed; adapt it to leave the head node and delete all that follows.
+		we can't just say delete head_ptr;
+		Because then we leak memory for the remaining nodes.
+		We got to delete from the front tot get the whole thing..
+			while(head_ptr != nullptr)
+			{
+				Node<ItemType>* to_delete = head_ptr;
+				head_ptr = head_ptr->getNext();
+				delete to_delete;
+			}
+		As in remove, we still have to keep track of the remaining nodes in the list
+		
+4/4/14
+	Read Trees chapter, pp.507-535
+	
+	Trees
+		Trees are like linked lists that can branch out but never in
+			Tree nodes have more than one fore() pointer
+		Instead of a head_ptr, we keep a pointer to the tree's root
+			Node farthest from the root are the leaves
+		Hierarchy: Parent/child, ancestor, siblings
+			Tree contain subtrees (recursive structure)
+			
+	Binary Trees
+		Nodes:
+			contain ItemType data;
+			have 2 children per node (n-ary tree: n children)
+			We call the children the left and right subtrees
+		Used to compute arithmetic expressions
+		Binary seach trees: special kind of binary tree
+			can work faster than lists/arrays
+			value at n is >= values in n's left subtree
+			value at n is < values in n's right subtree
+	
+	Tree Height
+		Empty tree height = 0
+		Else tree height is = 1 + height of largest subtree
+		If Binary tree is full, no nodes are missing at any height
+			height h >= 0; tree has 2^h - 1 nodes
+			If tree has n nodes, height is log2(n+1)
+		If it's complete, then the last row can be partiallly filled
+			left to right, no skipped children
+		Opposite of complete tree (degenerate case) looks like a list
+	
+	Tree traversals
+		Iterating through a tree's data is a recursive process
+		preorder_print(BinaryTree<ItemType> bintree)
+		{
+			if(bintree is not empty)
+			{
+				print out data at root
+				preorder_print(left subtree of bintree's root)
+				preorder_print(right subtree of bintree's root)				
+			}
+		}
+		
+		inorder_print(BinaryTree<ItemType> bintree)
+		{
+			if(bintree is not empty)
+			{
+				preorder_print(left subtree of bintree's root)
+				print out data at root
+				preorder_print(right subtree of bintree's root)				
+			}
+		}
+	
+	Binary search tree: search
+		Recall that data in node n is >= date in n's left subtree and < data in n's right subtree
+		search(BinarySearchTree bsttree, ItemType target)
+			if(bsttree is empty)
+				target not found
+			else if(target equals data item at root_
+				target found
+			else if(target <data item at root)
+				search(left subtree of bsttree, target)
+			else
+				search(right subtree of bsttree, target)
+				
+4/7/14
+	Read 507-535
+	Destroying a Binary tree
+	void tree_clear(binary_tree_node<ItemType>*& root_ptr)
+	{
+		binary_tree_noode<ItemType>* child;
+		if(root_ptr != nullptr)
+		{
+			child = root_ptr->left();
+			tree_clear(child);
+			child = root_ptr->right();
+			tree_clear(child);
+			delete root_ptr
+			root_ptr = nullptr;
+		}
+	}
+	
+	Copying
+	binary_tree_node<ItemType>* tree_copy(const binary_tree_node<ItemType>* root_ptr)
+	{
+		binary_tree_node<ItemType>* *l_ptr, * r_ptr;
+		if(root_ptr == nullptr) return nullptr;
+		else
+		{
+			l_ptr = tree_copy(root_ptr->left());
+			r_ptr = tree_copy(root_ptr->right());
+			return new binary_tree_node<ItemType>(root_tr->data(), l_ptr, r_ptr);
+		}
+	}
+	
+	Tree_clear
+		child = root_ptr->left(); tree_clear(child);
+		child = root_ptr->right(); tree_clear(child);
+		delete root_ptrl root_ptr = nullptr;
+		
+	Tree_copy:
+		l_ptr = tree_copy(root_ptr->left());
+		r_ptr = tree_copy(root_ptr->right());
+		return new binary_tree_node<ItemType>(root_tr->data(), l_ptr, r_ptr);
+		
+	Binary Tree Node Access
+		data(), left(), right(). They are all returning by reference, which means you can directly manipulate the private vars they
+			return by call this function and then trying to reassigning it once called
+		root_ptr->data() = entry82
+		root_ptr->left() = new binary_tree_node<ItemType>(entry);
+		
+	ArrayBag<string> bobo;
+	bobo.add("Q"),
+	bobo.setCurrentSize()=4;
+	
+	Insert
+	void BSTreeBag<ItemType>::insert(const ItemType& entry)
+	2 cases:
+		empty tree(ease to find where the item goes)
+		non empty tree:: walk a pointer from the root to a leaf
+			binar_tree_node<ItemType> *cursor;
+			cursor = root_ptr;
+			bool one = false;
+			while(!done)
+			{
+				// find where this entry goes
+			}
+			
+	Counting Items
+		unsigned int BSTreeBag<ItemType>::count(const ITemType& target)
+		{
+			unsigned int answer = 0;
+			binary_tree_node<ItemType> *cursor;
+			while(cursor != nullptr)
+			{
+				// Checks if cursor has the target as it's data
+				// If so, count answer up
+				// Set cursor to the right child and look for more
+			}
+		}
+		
+4/9/14
+	Read Sorting Ch 388-411
+	
+	Quadratic sort Algorithm
+		Selection Sort
+		Bubble Sort
+		Insertion Sort
+	
+	Selection Sort
+		Logic
+			Find biggest element in array and put it at the end
+			Find the second biggest item within an array and put it one slot before the end
+			third biggest in two slots before end, and so forth.
+			
+		int findIndexofLargest(const ItemType theArray[], int size)
+		{
+			int indexSoFar = 0;
+			for(int currentIndex = 1; currentIndex < size; currentIndex++)
+			{
+				if(theArray[currentIndex] > theArray[indexSoFar];
+					indexSoFar = currentIndex;
+			}
+		}
+		
+		for(int last = n-1; last >= 1; last--)
+		{
+			// Select the largest entry in theArray
+			int largest = findIndexofLargest(theArray, last+1);
+			// Swap largest with last
+			std::swap(theArray[largest], theArray[last]);
+		}
+		
+		findIndexOfLargest dominates the run time
+			checks n-1 itmes the first time, n-2 next, and so forth
+		O(n-1 + n-2 + ... + 2 + 1) = O(n * (n-1)/2) = O(n^2)
+		
+	Bubble Sort
+		Compare each pair of adjacent elements in the whole array
+		
+		void bubbleSort(ItemType theArray[], int n)
+		{
+			bool sorted = false;
+			int pass = 1;
+			
+			while(!sorted && (pass < n))
+			{
+				sorted = true;
+				for(int index = 0; index < n - pass; index++)
+				{
+					int nextIndex = index+1;
+					if(theArray[index] > theArray[nextIndex])
+					{
+						std::swap(theArrayindex], theArray[nextIndex]);
+						sorted = false;
+					}
+				}
+			}
+		}
+		
+	Insertion Sort
+		for(int unsorted = 1; unsorted < n; unsorted++)
+		{
+			ItemType nextItem = theArray[unsorted];
+			int loc = unsorted;
+			while((loc > 0) && (theArray[loc-1] > nextItem))
+			{
+				theArray[loc] = theArray[loc - 1];
+				loc--;
+			}
+		}
+		
+4/14/14
+	Exam Monday next week
+	Writeups: Double space, nut refernce and cover don't count into 6 pages
+		vimeo.com/channels/cucs
+	Heaps: Read 585-606
+	
+	Exam: Recursion Lab, String Alignment, Linked List, Binary Trees, Quadratic Sorting, Algorithms, Previous Meterials
+	Review online, Last HW in Java.
+	
+	Goals
+		Recognize the relationship between hpow we store data and how we can process it
+		Containers: ways to store data
+			Sorted or unsorted arrays, list, trees, graphs, etc.
+			Each of these is a different data structure
+		Different containers mnay take more or less time to perform tasks
+			Search of unsorted vs. sorted array, for instances
+		This is the fundamental connection between data structures and the algorithms that worked on them.
+		
+		Memory
+			Understand how the computer represents our data in memory
+				local variables in functions
+				this and other pointers
+				construcutores and destructors
+				new and dlete, heap vs stack
+				deep and shallow copies
+				reference parameters and return types
+				const/non-const functions, parameters and return types
+			
+			Memory bugs are very trickt tro find or figure out, but if you know how these things works, you can
+				often figure out when common things are going wrong.
+				
+		Mental Compiler
+			Code analysis:
+				Recognize which functions are getting called
+				Tracing code through multiple functions by hand, with gdb, a recursive function until it hits a base case
+				Counting operators to estimate the big-O run time of an algorithm on a given data structure
+				Being able to recognise when you could do a task in fewer operations or using less memory than the current code requires
+		
+		Software Development
+			Understand why you need good coding habits:
+				Write the simplest functions you can
+				Test functions right away
+				reuse code whenever possible
+				Split code into public and private vars anf functions
+				Make code work for many different data types
+				
+		Almost none of this material is specific to C++ only
+		But C++ exposes you to details of all of it very directly
+		Understanding it in C++ means you can pick up new languages more quickly
+		
+	Faster Sorting Algorithms
+		Mergesort
+			Mergesort takes a very simple approach to sorting, in which it keeps splitting its array in half until
+				the array has only one item. A single item array is, by definition, sorted;
+				nothing is our of order there. This step is pretty easy to program.
+			
+			8 4 5 2 1 7 6 3
+			8 4 5 2		1 7 6 3
+			8 4		5 2		1 7		6 3
+			8	4	5	2	1	7	6	3
+			
+			When all ther arrays of size one, we begin merging thm into size-2 arrays that are sorted.
+			This is the part of the program that takes a little more work to write.
+			
+			8	4	5	2	1	7	6	3
+			4 8		2 5		1 7		3 2
+			2 4 5 8		1 2 3 7
+			1 2 3 4 5 6 7 8
+			
+			Mergesort splits a size-n array in half log2(n) times. Ite then merges each array; merging 2 arrays of size
+				n/2 to get one array of size n take n comparasions. Just as there were log2(n) splits there are log2(n)
+				merges. The total time for mergesort is n log2(n). This is true in the best case and the worst case (unlike
+				insertion sort or bubble sort).
+				
+			O(log2(n) + log2(n*n)
+			
+			The downside of mergesort is that each of the little merges requires us to make an extra array to hold
+				the merg data. We copy this array back at each step to the main array and write the merges into the secondf array.
+				The overhead of this extra array s pretty expensive, for large n.
+				
+		Heap Sort
+			Pages 585-606 in text.
+			
+				[100]
+				 / \
+		 	 [80]	[30]
+			 / \	  / \
+		 [30]  [10] [2] [1]
+			
+			Before heapsort, we must discuss the ind of binary tree that is a heap. Like binary trees, heaps depend on the order in which we add items.
+				Unlike binary trees, heaps remain complete, which keeps them balanced.
+		Binary Tree Heaps
+			Binary trees can be organized as binary search trees, as you know. They can also be organized as heaps, using different rules.
+			Rule 1. Heaps (unlike binary search tree)
+			
+			Rule 2. In addition, the data at every node of a heap must be greater than or equal to the date in each
+				of its children. By extension, this means that the largest item is at the root. Make sure you understand why.)
+				
+				EX of heap for this lecture, we assume that A<B and so on.
+				
+				The reason we need to enforce this
+				
+			1a. Inserting Items into Heaps
+				To insert into an empty heap, we just make a single node at the root.
+				A
+				
+				To insert into a non-empty heap, we insert the new item at the first open spot in the complete tree:
+				  A
+				 /
+				B
+				
+				But now out new items might be breaking the heap rules. Is it bigger than its parent?
+				
+				
+				Add a third item to the heap in the next open row:
+				
+				
+				Now this third item is our of order with its parent, so we swap:
+				
+				Each time we add a new item, we start out in the next open spot in the lowest tow, and then we swap that new item with its parent 
+					as many times as we need to for the heap to be valid.
+			
+				So what's the cost of all those swaps> Is it expensive> It's not so bad. It's limited by the height of the tree. 
+					If you rememver how messy binary search trees could get, then maybe that restriction does not impress you yet. 
+					But remember that heaps are complete trees. They can't sprawl out into
+					But remember that heaps are complete trees. They can't sprawl out into
+4/16/14		
+		Removing things from heaps
+			What aboue removing an item from the heap? we only do this when we want the biffest item. The biggest item is the one at the root, 
+				of course. Remember the recursive rule for heap comparisons. Removing the root definitely messes up our heap, though. 
+			
+			As before, we have to keep swapping along the  the tree until we have a valid heap again. In this example, two more swaps
+				are still needed to restore the heap's order
+				
+		The reason we need to enforce completeness on the heap's binary tree is that when we write algorithms that use heaps, 
+			we end up really using an array. The binary tree itself is usually imaginary.
+		
+		The trick here is to write 3 functions for the array, so it can act like a complete binary tree. These guys 
+			do integer division (remember, that rounds down…) 
+
+			unsigned int parent_index(unsigned int child_index) 
+			{ 
+				return (child_index - 1) / 2; 
+			} 
+			unsigned int left_child_index(unsigned int parent_index) 
+			{ 
+				return 2*parent_index + 1; 
+			} 
+			unsigned int right_child_index(unsigned int parent_index) 
+			{ 
+				return 2*parent_index + 2; 
+			} 
+			
+		To sort arrays, you build a heap in array format in the first part of the array, adding and swapping as we go.
+		
+		n*log2(n) Swaps to make the big heap
+		swaps to get the heap into sorted array
+		
+	Quicksort
+		Takes a different approach to sort the array in place. Its first job is to identify a pivor element in the array.
+		We like this element to be in the middle range of the array, so we often check the first element, the middle element, and 
+		the last element and take their median value. For us, that's 3, we'll remember that value.
+		
+		The main work of quicksort is a process called partitioning, which puts the pivot in the correct place and puts the items <= 
+		pivots on the left hand side of the pivot, and all the items > pivot on the right hand side.
+		
+4/18/14
+	[[3][7][8][10][]] Items[itemCount++] = new_item
+	17. Buggy
+		void d2b(ostream& outs, unsigned int n)
+		{
+			if (n <= 1)
+				outs << n;
+			else
+			{
+				outs << n%2;
+				d2b(outs, n/2)
+			}
+		}
+	16.
+		bool valid(binary_tree_node<ItemType>* rootptr)
+		{
+			if(root_ptr == nullptr)
+				return true;
+			if(root_ptr->left() != nullptr && root_ptr->data < root_ptr->left()->data())
+				return false;
+			if(root_ptr->right() != nullptr && root_ptr->data > root_ptr->left()->data())
+				return false;
+			return valid(root.ptr->left()) && valid(root.ptr->right())
+		}
+		
+		ex: Passes first check fail, third failed
+		50
+		/ \
+		40 200
+		
+	5:	If assignment operator and ciot constructer we removed
+		BigNum x = 99;
+		BigNum x = -9877
+		BigNum p = x
+		BigNum q = 9;
+		q = r
+		
+		x: used = 2
+			positive = true;
+			digits[] > [9][9][..][..]
+			p points to the same thing as x
+			Shallow copy constructor
+		P: used = 2
+			positive = tue;
+			digits[]
+		
+		Overwriting BigNum with another data will cause memory leak.
+			
+	Search of binary tree -> Depends on the shape of the tree. Branching tree, O(log(n)), Lined tree: O(n) BST between N-logN
+	1.
+		O(1) O(n) O(n)
+		O(n*) O(n*) O(log n)
+		O(1) O(n) O(n)
+	8-9.
+	
+4/23/14
+	Collections in Java
+		Java contains template containers classes for arrays, lists, trees hash tables, maps, stacks, queues, and deques
+			So does C++ look in the standard template liv STL
+		Use import to bring these into your code (works like #include)
+			import java.util.ArrayList;
+		Initialize these collections with the new statement
+			ArrayList<String> al = new ArrayList<String>();
+		Never need to delete these in Java (garbage collection takes care of this for you.)
+		These template classes are modular, which allow us to combine or nest these collections:
+			// Array of Strings
+			ArrayList<String> al = new ArrayList<String>();
+			// Array list of arrays of string
+			ArrayList<ArrayList<String>> al2 = new ArrayList<ArrayList<String>>();
+			//...
+		
+	Stack
+		We can also make new classes from existing ones.
+		A stack is an array or a list that adds and removes from only one end
+			Last in, First out (LIFO)
+			Add by pushing new items onto end
+			Remove by popping (removing)items at end
+			Gives you a way to remember data before you process it
+			
+		Stack application 1: balanced{}
+			Make stack of char letters
+			Read in text for C++ code
+			When you see {, push it on the stack
+			When you see }, pop one { off the stack
+			
+			If the stack is empty at the end, you had equal numbers of { and }, so they're probably balanced
+			If the stack has any { left, you had too few }
+			If the program crshes on pop, you had too many }
+			
+			Make stack of numbers
+			Read in expression
+			When you see a number, push it on the stack
+			When you see an operation,
+				Pop top number off stack,
+				Pop next number off stack,
+				Combine those numbers, using the operation, to get a new number,
+				and push that number on the stack
+			When you are done with the expression, your final answer is the only number lest on the stack.
+			
+			How would you write a stack?
+				With an array:
+					Partially filled array, like ArrayBag
+					Better to add and remove at the end than at the start
+				With a linked list:
+					Singly linked list
+					Better to add or remove at the head_ptr
+		Queue
+			The opposite of a stack is a queue, which adds to one end and removes from the other, like a line at the grocery store
+				First in, First out (FIFO)
+				Add by putting new items on at one end
+				Remove items at other end
+				Give you a way to remember data
+			How would you write a queue?
+				With linked list:
+					oubly linked list with tail_ptr
+					Add data at head of list
+					Remove data at tail of list
+				Array: How to avoid the shifting?
+					Make array with the largest size the queue will ever need
+					Remember the first spot that's filled at the front and the last spot that's free at the back
+					Use modulus % to circularize the queue.
+		Deques
+			We can also make a deque, which is a doubly ended queue
+				Add to either end
+				Remove item at either end
+				Acts like a stack if you use the same end to add and remove
+				Acts like a queue if you use opposite ends to add and remove
+		Maps
+			We can also make a map, to store data by key
+				Store key value pair, retrievable by key
+			Think of a map like an address book
+				Look up name, easy to remember
+				Get phone number, hard to remember
+			TreeMap<String, String> addr = new TreeMap<String, Strin>();
+			addr.put("Barack Obama", "1600 Pensylvania Avenue");
+			
+			// Gets a list of the keys
+			for(String key: addr.keySet())
+				// print each key and the value for it
+				System.out.println("You can find the person " + key + " at the location " + addr.get(key));
+		
+		Graphs,
+			Vertices and edges
+			Edges describe relationships between entities at vertices
+			This is a social network graph
+			Last HW is on Graph traversals
+			
+
+4/25/14
+	Depth First Search of a Graph
+		Here's a graphalong with its edge vector representation; for simplicity we assign all edges a cost of 1 for now.
+		
+		We want a method that automatically explores the graph and finds a path from vectex S to T, if that's feasible.
+		To prime the search, We take our starting node S and add it to a paticular kind of vector, called toExplore.
+		We also initialize another vector of boolean values, called visited, to all-dalse except for S.
+		Since we're starting the search there we can consider S as visited.
+		
+		Now we repeat these steps:
+			1 While the stack is not empty,
+			2	We pop v, the top vertex in yetToExplore, out of the stack
+			3	If v is our destination, the we're done; exit the loop
+			4	else
+			5		For each neighboring vertex that v has an edge on
+			6			If we have not visited this neighbor
+			7				then add it to the top of yetToExplore and set its visited to true.
+			
+		The first time through, the vertex we added
+		From S, we can fet to a and b; once s is off yetToExplore
+		
+4/30/14
+	Dictionaries
+	skim 608
+	
+	Search an array
+		Unsorted: O(n)
+		Sorted: O(log(n))
+		
+	Hash Table
+		I store the information about you in a Map as a key, value pair
+		Key: Your SSN
+		Value: Your stolent id info ( bank aounvts, passwords, mother's maiden name, etc)
+		
+		Fast storage via hash function
+		Make an array if 1000 slots for stolen identities
+		add new stolen id as pair <SSN, Stolen ID>;
+			Take SSN % 1000 to get array slot
+			Division's fast; call this % operation O(1)
+		So, we can find the correct slot in O(1) time!
+	
+	Problems?
+		What happens if another person's SSN hases to the same slot>
+			This is called a collision in the table.
+		3 ways to handle collisions:
+			Put the new person's data in the next open slot
+			Apply a second hash functions to find another slot
+			Make each slot the head_ptr of a linked list and keep both people's data in the list for this slot.
+			
+	Collision solution 1: Linear probing
+		If we want to insert something into the table and there's already an item there, keep looking for a new open slot after the one we wanted
+			to use.
+		Problem: this causes more collisions down the line, and collisions become more frequent as our table fills.
+		How many slots will we look at to find an item in the table?
+		If our table is 80% full (alpha = 0.8) then looking for an item will take 1/2 (1 + 1/(1-alpha)) slots if it's there. more if not.
+	
+	Collision solution 2: double hashing
+		If we want to insert something into the table and there's already an item there, apply a second hash function (independent
+			of the first) to find a spot
+		Problem: This also causes more collsions down the line, and collisions become more frequent as our table grows.
+		
+		
+	Solutions 3: chained hashing
+		Each slot in the table is a head of a linked list now, No collisions, but alpha will be able to exceed 1
+		If 120% full (1.2 = alpha), then alpha is the average length of the lists in our table, and then looking for an item will take
+		1+ alpha/2 slot if it's there.
+		
+REVIEW
+	Arrays
+		Most unbiquitous data structure you'll ever use.
+		We statred with fixed size arrays that could fill up
+			Unsorted: O(1) to add, O(n) to find, O(n) to remove
+		Then we learned to write resize and copy to make room
+		We learned that we can search a sorted array faster...
+			Binary Search is O(log n); removal is O(n), add O(n)
+	Pointers
+		Store addresses of vars in memory
+		Any pointer var is a class lke ArrayBag's items or BigNum digits. Raises the risk of a shallow copy.
+		
+	Linked Lists
+		Still a linear data structure
+		Held together entirely by pointers
+		Compared to arrays, it's easier to add and remove nodes and avoid shifting in the list
+		But it's slower to find element n in the list, and the pointer dereferences slow it down a little
+		Most critical data structures to understand for CSCI 2400
+		
+	Trees
+		Acts like linked list with branches outward
+		Held together entirely by pointers
+		We prefer trees that are blanced not list-like
+		Balanced BST of n items is seachable in O(log n) time
+		Most critical data strucutre to understnad for programmming languages and natural language processing
+	
+	Sorting
+		Quadratic: Bubble, selection, insertion sort, O(n^2)
+		Recursive Sorts are preferable, O(n log n)
+		Mergesort:
+			Splite arrya into tiny sorted arrays, easy
+			Merge sorted arrays back together (time consuming)
+			Log n splits, each merging all n items: O(n log n)
+			Needs an extra arrya's worth of space
+	
+		Heapsort
+			Add each element to a heap, in array form, not tree form, and wap children with parents to make the proper heap
+			When done, largest element is at the root.
+			Move element to back of array and re-heapify
+			Timing: O(n log n)
+				Add n elements to heap, repairing with log(n) swaps per element
+				Remove n elements from heap, repairing with log(n) swaps per element
+		
+		Quicksort:	Based on partition algorithm
+			Choose a pivot
+			Run a counter from the back of the array, backwards until it finds an element < pivot
+			Run a counter from the front of the array forwards until it finds an element > pivot
+			Swap elements
+			Resume counters
+			When counters pass each other, swap the last element > pivot with the pivot
+			Time: O(n log N) best case, O(n^2) if bad pivots chosen.
+			Bad pivots, the smallest or largest vals.
+	
+	Stacks and Queues
+		Special array/list structures
+		Stack: last in, first out
+		Queue: First in, first out
+		Deque: Add and remove from either end.
+		
+	Graphs
+		Like trees with no branching rules
+		Used to keep track of relationships between entities
+		We studied how to look through all the elements in a grapg by depth first or breadth first search
+		Search depends on using a stack DSF or a queue BFS
+		Be able to traverse a small graph by either rule.
+			DSF: Will run as far way from initial as possible
+			BFS: Goes through all points and paths
+	
+	Hash table
+		Get close to linear time in search bu using hash function
+		Collisions are inevitable, so it's not prefectly linear
+		Depends on alpha, how full the table is
+			Opening addressing: inspect 1/2 (1+ 1/(1-alpha)) slots if item's there
+			Double hash: inspect -ln(1 - alpha)/alpha
+			Chained hashing: inspect 1 + alpha/2
+		
